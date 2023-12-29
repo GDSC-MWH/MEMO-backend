@@ -40,19 +40,17 @@ enc_known_face = fr.face_encodings(known_face)[0]  # [0]은 첫 번째 얼굴의
 
 #### 3. 얼굴 비교 ####
 
-# 등록된 얼굴 리스트 비교
+
 for face in face_list:
     # 최근 50장과 중요 인물 얼굴 받아오기
     distance = fr.face_distance([enc_known_face], fr.face_encodings(face)[0])
 
-    # distance 수치를 포함한 얼굴 출력
-    plt.title("distance : " + str(distance))
-    plt.imshow(face)
-    plt.show()
-
     # 결과 출력
-    if distance >= 0.6:
-        print("다른 사람")
-    else:
+    if distance[0] <= 0.6:
         print("유사")
-    print()
+        plt.imshow(face)
+        # distance 수치를 포함한 얼굴 출력
+        plt.title("distance : " + str(distance[0]))
+        plt.show()
+    else:
+      pass
