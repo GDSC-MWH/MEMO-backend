@@ -26,25 +26,26 @@ enc_face_list = []
 face_list = []
 
 folder_path = "/photos/test"
-blobs = bucket.list_blobs_with_prefix("memo-ce15c",prefix=folder_path, delimiter='/')
-
+blobs = bucket.list_blobs(prefix=folder_path, delimiter='/')
+# 경로를 받아오는 과정에서 오류
 
 
 # Firebase Storage에서 특정 폴더의 이미지 다운로드 및 얼굴 인코딩
-for filename in blobs :
+for blob in blobs:
+    if blob.name.lower().endswith((".jpg", ".jpeg", ".png")):
+        # 다운로드
+        blob_bytes = blob.download_as_bytes()
+        nparr = np.frombuffer(blob_bytes, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    if filename.lower().endswith((".jpg", ".jpeg", ".png")):
-
-         # 얼굴 인코딩
-        face_locations = fr.face_locations(filename)
-
+        # 얼굴 인코딩
+        face_locations = fr.face_locations(img)
         if face_locations:
-            enc_face_list.append(fr.face_encodings(filename, known_face_locations=face_locations)[0])
-            face_list.append(filename)
+            enc_face_list.append(fr.face_encodings(img, known_face_locations=face_locations)[0])
+            face_list.append(blob.name)
 
 
 # 중요 인물 얼굴 받아오기
-name = input("중요 인물의 이름: ")
 image_path = input("중요 인물의 경로 입력: ")
 known_person = fr.load_image_file(image_path)
 
