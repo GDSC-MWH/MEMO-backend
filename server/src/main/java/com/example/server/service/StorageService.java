@@ -47,13 +47,14 @@ public class StorageService {
     public byte[] getImage(String url) throws IOException {
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("src/main/resources/serviceAccountKey.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).setProjectId("MEMO").build().getService();
-        Blob blob = storage.get("memo-ce15c", url); // your-bucket-name은 실제 버킷 이름으로 대체되어야 합니다.
         try {
-            return blob.getContent(Blob.BlobSourceOption.generationMatch());
+            BlobId blobId = BlobId.of(firebaseBucket, url);
+            Blob blob = storage.get(blobId); // your-bucket-name은 실제 버킷 이름으로 대체되어야 합니다.
+            System.out.println(blob);
+            return blob.getContent();
         } catch (NullPointerException e) {
-            // blob이 null일 때의 처리
+            System.out.println(e);
         } catch (Exception e) {
-            // 기타 예외 처리
         }
         return new byte[0];
     }

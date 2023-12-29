@@ -38,7 +38,8 @@ public class DayController {
 
         for (MultipartFile file : files) {
             // 이미지를 Firebase Storage에 업로드하고 다운로드 URL을 Firestore 데이터에 추가
-            String imageUrl = storageService.uploadImage(file,date, file.getOriginalFilename());
+            storageService.uploadImage(file,date, file.getOriginalFilename());
+            String imageUrl = "photos/" + date + "/" + file.getOriginalFilename();
             photos.add(new Photo(imageUrl, "none"));
         }
         day.setPhotos(photos);
@@ -59,10 +60,8 @@ public class DayController {
         for ( Photo photo : photos) {
             String url = photo.getUrl();
             byte[] imageData = storageService.getImage(url);
-
             // 이미지 파일을 Base64로 인코딩하여 문자열로 변환
-            base64EncodedImage = Base64.getEncoder().encodeToString(imageData);
-            imageList.add(base64EncodedImage);
+            imageList.add(Base64.getEncoder().encodeToString(imageData));
         }
         return new ResponseDay(day.getDate(),day.getDiary(), imageList);
     }
